@@ -1,0 +1,8 @@
+﻿@model Production.Models.Employee
+
+@{
+    ViewData["Title"] = "Edit employee";
+    ViewData["Action"] = Url.Action("UpdateEmployee");
+}
+
+@await Html.PartialAsync("_EmployeeForm", Model)

@@ -1,0 +1,63 @@
+﻿@model Production.Models.RawMaterial
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="~/css/styles.css"/>
+    <title>@ViewData["Title"]</title>
+</head>
+<body>
+<div>
+    <h2>
+        @ViewData["Title"]
+    </h2>
+</div>
+
+<div class="edit_product mt-4">
+
+    <form action="@ViewData["Action"]" method="post">
+        @if (!ViewData.ModelState.IsValid)
+        {
+        <div class="alert alert-danger">
+            @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+        </div>
+        }
+        <input type="hidden" name="ID" value="@Model.Id"/>
+
+        <div class="form-group mb-3">
+            <label for="Name">Название</label>
+            <input type="text" class="form-control" id="Name" name="Name" value="@Model.Name">
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="MeasurementUnitId">Единица измерения</label>
+            <select class="form-control" id="MeasurementUnitId" name="MeasurementUnitId">
+                @foreach (var unit in ViewBag.MeasurementUnits)
+                {
+                    <option value="@unit.Id" selected="@(unit.Id == Model.MeasurementUnitId ? "selected" : null)"> @unit.Name</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="Quantity">Количество</label>
+            <input type="number" class="form-control" id="Quantity" name="Quantity" step="any" value="@Model.Quantity">
+            <span asp-validation-for="Quantity" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="TotalAmount">Общая сумма</label>
+            <input type="number" class="form-control" id="TotalAmount" name="TotalAmount" step="any" value="@Model.TotalAmount">
+            <span asp-validation-for="TotalAmount" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+    </form>
+</div>
+</body>
+</html>

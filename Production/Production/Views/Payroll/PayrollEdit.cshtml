@@ -1,0 +1,51 @@
+﻿@model Production.DTO.PayrollEditDto
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="~/css/styles.css"/>
+    <title>Edit total amount</title>
+</head>
+<body>
+
+<div>
+    <h2>
+        Edit Total Amount
+    </h2>
+</div>
+
+<div class="edit_product mt-4">
+
+    <form action="@Url.Action("UpdateTotalAmount")" method="post">
+        @if (!ViewData.ModelState.IsValid)
+        {
+        <div class="alert alert-danger">
+            @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+        </div>
+        }
+        
+        <input type="hidden" name="ID" value="@Model.Id"/>
+        <input type="hidden" name="Year" value="@Model.Year"/>
+        <input type="hidden" name="Month" value="@Model.Month"/>
+
+        <div class="form-group mb-3">
+            <label for="Name">FullName</label>
+            <input type="text" class="form-control" id="Name" name="FullName" value="@Model.FullName">
+            <span asp-validation-for="FullName" class="text-danger"></span>
+        </div>
+        
+        <div class="form-group mb-3">
+            <label for="TotalAmount">Total amount</label>
+            <input type="number" step="0.01" class="form-control" id="TotalAmount" name="TotalAmount" value="@Model.TotalAmount">
+            <span asp-validation-for="TotalAmount" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+    </form>
+</div>
+
+</body>
+</html>

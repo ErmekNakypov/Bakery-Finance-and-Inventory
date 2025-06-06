@@ -1,0 +1,56 @@
+﻿@model List<Production.Models.MeasurementUnit>
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="~/css/styles.css"/>
+    <title>Measurement Unit</title>
+</head>
+<body>
+<div>
+    <div>
+        <h2>
+            Measurement Units
+        </h2>
+    </div>
+    <div class="under_table_buttons">
+        <a href="@Url.Action("CreateMeasurementUnit")" class="btn btn-primary">Add</a>
+    </div>
+    @if (Model.Count == 0)
+    {
+    <p>Measurement Units not found.</p>
+    }
+    else
+    {
+    <table>
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var measurementUnit in Model)
+        {
+        <tr>
+            <td>@measurementUnit.Name</td>
+            <td>
+                <a href="@Url.Action("GetMeasurementUnitById", new {id = measurementUnit.Id})" class="btn btn-warning">Edit</a>
+                <form class="delete_product"  method="post" action="@Url.Action("DeleteMeasurementUnit", new {id = measurementUnit.Id})">
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure?');">
+                        Delete
+                    </button>
+                </form>
+            </td>
+        </tr>
+        }
+        </tbody>
+    </table>
+    }
+</div>
+</body>
+</html>

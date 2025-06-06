@@ -1,0 +1,63 @@
+﻿@model List<Production.Models.ProductManufacturing>
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Product Manufacturing</title>
+    <link rel="stylesheet" href="~/css/styles.css"/>
+</head>
+<body>
+<div>
+    <div>
+        <h2>
+            Product Manufacturing
+        </h2>
+    </div>
+    <div class="under_table_buttons">
+        <a href="@Url.Action("CreateProductManufacturing")" class="btn btn-primary">Produce</a>
+    </div>
+    @if (Model.Count == 0)
+    {
+    <h2>Product Manufacturings not found.</h2>
+    }
+    else
+    {
+    <table>
+        <thead>
+        <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Manufacturing Date</th>
+            <th>Employee</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var productManufacturing in Model)
+        {
+        <tr>
+            <td>@productManufacturing.Product.Name</td>
+            <td>@productManufacturing.Quantity</td>
+            <td>@productManufacturing.ManufacturingDate</td>
+            <td>@productManufacturing.Employee.FullName</td>
+            <td>
+                <a href="@Url.Action("GetProductManufacturingId", new {id = productManufacturing.Id})" class="btn btn-warning">Edit</a>
+                <form class="delete_product"  method="post" action="@Url.Action("DeleteProductManufacturing", new {id = productManufacturing.Id})">
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure?');">
+                        Delete
+                    </button>
+                </form>
+            </td>
+        </tr>
+        }
+        </tbody>
+    </table>
+    }
+
+</div>
+</body>
+</html>

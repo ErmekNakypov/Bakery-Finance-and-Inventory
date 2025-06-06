@@ -1,0 +1,8 @@
+﻿@model Production.Models.ProductSale
+
+@{
+    ViewData["Title"] = "Edit Product Sale";
+    ViewData["Action"] = Url.Action("UpdateProductSale");
+}
+
+@await Html.PartialAsync("_ProductSaleForm", Model)

@@ -1,0 +1,67 @@
+﻿@model Production.Models.Credit
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="~/css/styles.css"/>
+    <title>@ViewData["Title"]</title>
+</head>
+<body>
+<div>
+    <h2>
+        @ViewData["Title"]
+    </h2>
+</div>
+
+<div class="edit_product mt-4">
+    
+    <form action="@ViewData["Action"]" method="post">
+        @if (!ViewData.ModelState.IsValid)
+        {
+        <div class="alert alert-danger">
+            @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+        </div>
+        }
+        <input type="hidden" name="ID" value="@Model.Id"/>
+        
+        <div class="form-group mb-3">
+            <label for="TotalAmount">Total Amount</label>
+            <input type="number" class="form-control" id="TotalAmount" name="TotalAmount" step="any" value="@Model.TotalAmount">
+            <span asp-validation-for="TotalAmount" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="SaleDate">Start Date</label>
+            <input type="date" class="form-control" id="StartDate" name="StartDate" value="@(Model.StartDate == default(DateOnly) ? DateTime.Today.Date.ToString("yyyy-MM-dd") : Model.StartDate.ToString("yyyy-MM-dd"))">
+            <span asp-validation-for="StartDate" class="text-danger"></span>
+        </div>
+
+
+        <div class="form-group mb-3">
+            <label for="TermInYears">Term In Years</label>
+            <input type="number" class="form-control" id="TermInYears" name="TermInYears" value="@Model.TermInYears">
+            <span asp-validation-for="TermInYears" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="InterestRate">Interest Rate</label>
+            <input type="number" class="form-control" id="InterestRate" name="InterestRate" step="any" value="@Model.InterestRate">
+            <span asp-validation-for="InterestRate" class="text-danger"></span>
+        </div>
+
+
+        <div class="form-group mb-3">
+            <label for="Penalty">Penalty</label>
+            <input type="number" class="form-control" id="Penalty" name="Penalty" step="any" value="@Model.Penalty">
+            <span asp-validation-for="Penalty" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+    </form>
+</div>
+</body>
+</html>

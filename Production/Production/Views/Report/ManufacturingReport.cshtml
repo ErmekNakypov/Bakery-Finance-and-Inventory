@@ -1,0 +1,256 @@
+﻿@using System.Text.Json
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="~/css/styles.css"/>
+    <title>Manufacturing report</title>
+</head>
+<body>
+<div>
+    <div>
+        <h2>Manufacturing report</h2>
+    </div>
+    <div class="report-select">
+        <form method="get" action="@Url.Action("GetManufacturingReportByType", "Report")">
+            <select class="form-control" name="id" onchange="this.form.submit();">
+                <!option value="" disabled @(ViewBag.SelectedReportId == null ? "selected" : "")>
+                    -- Select a type --
+                </!option>
+                @foreach (var type in ViewBag.ReportTypes as List<SelectListItem>)
+                {
+                <!option value="@type.Value" @(ViewBag.SelectedReportId?.ToString() == type.Value ? "selected" : "")>@type.Text</!option>
+                }
+            </select>
+        </form>
+    </div>
+    
+    @if (ViewBag.ReportData == null || ViewBag.ReportData.Count == 0)
+    {
+        <h2>Manufacturing's not found.</h2>
+    }
+
+    @if (ViewBag.SelectedReportId != null)
+    {
+    <h2>@ViewBag.ReportTitle</h2>
+    <div class="d-flex justify-content-center my-4">
+        <button type="button" class="btn btn-outline-primary mb-3" onclick="toggleDateRange()">Set Date Range</button>
+    </div>
+    <form id="dateRangeForm" method="get" action="@Url.Action("GetManufacturingReportByType", "Report")"
+          style="display:@(ViewBag.StartDate != null && ViewBag.EndDate != null ? "block" : "none")">
+        <input type="hidden" name="id" value="@ViewBag.SelectedReportId"/>
+
+        <div class="d-flex justify-content-center mb-3">
+            <div class="form-group mx-2">
+                <label for="startDate">Start Date:</label>
+                <input type="date" class="form-control" id="startDate" name="startDate"
+                       value="@ViewBag.StartDate?.ToString("yyyy-MM-dd")" onchange="checkAndSubmit()"/>
+            </div>
+            <div class="form-group mx-2">
+                <label for="endDate">End Date:</label>
+                <input type="date" class="form-control" id="endDate" name="endDate"
+                       value="@ViewBag.EndDate?.ToString("yyyy-MM-dd")" onchange="checkAndSubmit()"/>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-center">
+            <button type="button" class="btn btn-outline-danger" onclick="resetDateRange()">Reset</button>
+        </div>
+    </form>
+    }
+    @if (ViewBag.ReportData == null || ViewBag.ReportData.Count > 0)
+    {
+        var jsonModel = JsonSerializer.Serialize(ViewBag.ReportData);
+        var jsonModelTotal = JsonSerializer.Serialize(ViewBag.ReportTotal);
+
+        <div class="under_table_buttons dropdown">
+            <button class="btn btn-primary dropdown-toggle" type="button" id="downloadDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                Download
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="downloadDropdown">
+                <li>
+                    <form method="post" action="@Url.Action("DownloadManufacturingPdf", "Report")">
+                        <input type="hidden" name="id" value='@ViewBag.SelectedReportId'/>
+                        <input type="hidden" name="jsonModel" value='@Html.Raw(jsonModel)'/>
+                        <input type="hidden" name="jsonModelTotal" value='@Html.Raw(jsonModelTotal)'/>
+                        <input type="hidden" name="startDate" value='@ViewBag.StartDate'/>
+                        <input type="hidden" name="endDate" value='@ViewBag.EndDate'/>
+                        <button type="submit" class="dropdown-item">PDF</button>
+                    </form>
+                </li>
+                <li>
+                    <form method="post" action="@Url.Action("DownloadManufacturingExcel", "Report")">
+                        <input type="hidden" name="id" value='@ViewBag.SelectedReportId'/>
+                        <input type="hidden" name="jsonModel" value='@Html.Raw(jsonModel)'/>
+                        <input type="hidden" name="jsonModelTotal" value='@Html.Raw(jsonModelTotal)'/>
+                        <input type="hidden" name="startDate" value='@ViewBag.StartDate)'/>
+                        <input type="hidden" name="endDate" value='@ViewBag.EndDate'/>
+                        <button type="submit" class="dropdown-item">Excel</button>
+                    </form>
+                </li>
+                <li>
+                    <form method="post" action="@Url.Action("DownloadManufacturingWord", "Report")">
+                        <input type="hidden" name="id" value='@ViewBag.SelectedReportId'/>
+                        <input type="hidden" name="jsonModel" value='@Html.Raw(jsonModel)'/>
+                        <input type="hidden" name="jsonModelTotal" value='@Html.Raw(jsonModelTotal)'/>
+                        <input type="hidden" name="startDate" value='@ViewBag.StartDate)'/>
+                        <input type="hidden" name="endDate" value='@ViewBag.EndDate'/>
+                        <button type="submit" class="dropdown-item">Word</button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+        @if (ViewBag.ReportTitle == "Manufacturing by Products")
+        {
+            <table>
+                <thead>
+                <tr>
+                    <th>№</th>
+                    <th>
+                        <a href="@Url.Action("GetManufacturingReportByType", new { id = ViewBag.SelectedReportId, sortField = "Name", sortDirection = ViewBag.NextSortDirection })">
+                            Product
+                            @if (ViewBag.SortField == "Name")
+                            {
+                                <span>@(ViewBag.SortDirection == "ASC" ? "▲" : "▼")</span>
+                            }
+                        </a>
+                    </th>
+                    <th>
+                        <a href="@Url.Action("GetManufacturingReportByType", new { id = ViewBag.SelectedReportId, sortField = "Quantity", sortDirection = ViewBag.NextSortDirection })">
+                            Quantity
+                            @if (ViewBag.SortField == "Quantity")
+                            {
+                                <span>@(ViewBag.SortDirection == "ASC" ? "▲" : "▼")</span>
+                            }
+                        </a>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                @{
+                    int i = 1;
+                }
+                @foreach (var productManufacturing in ViewBag.ReportData)
+                {
+                    <tr>
+                        <td>@i</td>
+                        <td>@productManufacturing.Name</td>
+                        <td>@productManufacturing.Quantity</td>
+                    </tr>
+                    i++;
+                }
+                <tr style="font-weight:bold; background-color:#f9f9f9;">
+                    <td colspan="2" style="text-align:right;">Totals:</td>
+                    <td>@ViewBag.ReportTotal.TotalQuantity.ToString("F2")</td>
+                </tr>
+                </tbody>
+            </table>
+        }
+        else if (ViewBag.ReportTitle == "Manufacturing by Employees")
+        {
+            <table>
+                <thead>
+                <tr>
+                    <th>№</th>
+                    <th>
+                        <a href="@Url.Action("GetManufacturingReportByType", new { id = ViewBag.SelectedReportId, sortField = "Name", sortDirection = ViewBag.NextSortDirection })">
+                            Employee
+                            @if (ViewBag.SortField == "Name")
+                            {
+                                <span>@(ViewBag.SortDirection == "ASC" ? "▲" : "▼")</span>
+                            }
+                        </a>
+                    </th>
+                    <th>
+                        <a href="@Url.Action("GetManufacturingReportByType", new { id = ViewBag.SelectedReportId, sortField = "Quantity", sortDirection = ViewBag.NextSortDirection })">
+                            Quantity
+                            @if (ViewBag.SortField == "Quantity")
+                            {
+                                <span>@(ViewBag.SortDirection == "ASC" ? "▲" : "▼")</span>
+                            }
+                        </a>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                @{
+                    int i = 1;
+                }
+                @foreach (var productManufacturing in ViewBag.ReportData)
+                {
+                    <tr>
+                        <td>@i</td>
+                        <td>@productManufacturing.FullName</td>
+                        <td>@productManufacturing.Quantity</td>
+                    </tr>
+                    i++;
+                }
+                <tr style="font-weight:bold; background-color:#f9f9f9;">
+                    <td colspan="2" style="text-align:right;">Totals:</td>
+                    <td>@ViewBag.ReportTotal.TotalQuantity.ToString("F2")</td>
+                </tr>
+                </tbody>
+            </table>
+        }
+        else if (ViewBag.ReportTitle == "Manufacturing Report All")
+        {
+            <table>
+                <thead>
+                <tr>
+                    <th>№</th>
+                    <th>Product</th>
+                    <th>Manufacturing Date</th>
+                    <th>Employee</th>
+                    <th>Quantity</th>
+                </tr>
+                </thead>
+                <tbody>
+                @{
+                    int i = 1;
+                }
+                @foreach (var productManufacturing in ViewBag.ReportData)
+                {
+                    <tr>
+                        <td>@i</td>
+                        <td>@productManufacturing.ProductName</td>
+                        <td>@productManufacturing.ManufacturingDate</td>
+                        <td>@productManufacturing.FullName</td>
+                        <td>@productManufacturing.Quantity</td>
+                    </tr>
+                    i++;
+                }
+                <tr style="font-weight:bold; background-color:#f9f9f9;">
+                    <td colspan="4" style="text-align:right;">Totals:</td>
+                    <td>@ViewBag.ReportTotal.TotalQuantity.ToString("F2")</td>
+                </tr>
+                </tbody>
+            </table>
+        }
+    }
+</div>
+<script>
+    function toggleDateRange() {
+        const form = document.getElementById("dateRangeForm");
+        form.style.display = (form.style.display === "none" || form.style.display === "") ? "block" : "none";
+    }
+
+    function checkAndSubmit() {
+        const startDate = document.getElementById("startDate").value;
+        const endDate = document.getElementById("endDate").value;
+
+        if (startDate && endDate) {
+            document.getElementById("dateRangeForm").submit();
+        }
+    }
+
+    function resetDateRange() {
+        document.getElementById("startDate").value = "";
+        document.getElementById("endDate").value = "";
+        window.location.href = '@Url.Action("GetManufacturingReportByType", "Report", new { id = ViewBag.SelectedReportId })';
+    }
+</script>
+</body>
+</html>

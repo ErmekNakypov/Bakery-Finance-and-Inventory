@@ -1,0 +1,202 @@
+﻿@using System.Text.Json
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Credit report</title>
+    <link rel="stylesheet" href="~/css/styles.css"/>
+</head>
+<body>
+<div>
+    <h2>@ViewBag.ReportTitle</h2>
+    <div class="report-select">
+        <form method="get" action="@Url.Action("GetCreditReportByType", "Report")">
+            <select class="form-control" name="id" onchange="this.form.submit();">
+                <!option value="" disabled @(ViewBag.SelectedReportId == null ? "selected" : "")>
+                    -- Select a type --
+                </!option>
+                @foreach (var type in ViewBag.ReportTypes as List<SelectListItem>)
+                {
+                <!option value="@type.Value" @(ViewBag.SelectedReportId?.ToString() == type.Value ? "selected" : "")>@type.Text</!option>
+                }
+            </select>
+        </form>
+    </div>
+    <div class="d-flex justify-content-center my-4">
+        <button type="button" class="btn btn-outline-primary mb-3" onclick="toggleDateRange()">Set Date Range</button>
+    </div>
+    <form id="dateRangeForm" method="get" action="@Url.Action("GetCreditReportByType", "Report")"
+          style="display:@(ViewBag.StartDate != null && ViewBag.EndDate != null ? "block" : "none")">
+        <div class="d-flex justify-content-center mb-3">
+            <div class="form-group mx-2">
+                <label for="startDate">Start Date:</label>
+                <input type="date" class="form-control" id="startDate" name="startDate"
+                       value="@ViewBag.StartDate?.ToString("yyyy-MM-dd")" onchange="checkAndSubmit()"/>
+            </div>
+            <div class="form-group mx-2">
+                <label for="endDate">End Date:</label>
+                <input type="date" class="form-control" id="endDate" name="endDate"
+                       value="@ViewBag.EndDate?.ToString("yyyy-MM-dd")" onchange="checkAndSubmit()"/>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-center">
+            <button type="button" class="btn btn-outline-danger" onclick="resetDateRange()">Reset</button>
+        </div>
+    </form>
+
+    @if (ViewBag.ReportData != null && ViewBag.ReportData.Count > 0)
+    {
+        var jsonModel = JsonSerializer.Serialize(ViewBag.ReportData);
+        var jsonModelTotal = JsonSerializer.Serialize(ViewBag.ReportTotal);
+        
+        <div class="under_table_buttons dropdown">
+            <button class="btn btn-primary dropdown-toggle" type="button" id="downloadDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                Download
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="downloadDropdown">
+                <li>
+                    <form method="post" action="@Url.Action("DownloadCreditPdf", "Report")">
+                        <input type="hidden" name="id" value='@ViewBag.SelectedReportId'/>
+                        <input type="hidden" name="jsonModel" value='@Html.Raw(jsonModel)'/>
+                        <input type="hidden" name="jsonModelTotal" value='@Html.Raw(jsonModelTotal)'/>
+                        <input type="hidden" name="startDate" value='@ViewBag.StartDate'/>
+                        <input type="hidden" name="endDate" value='@ViewBag.EndDate'/>
+                        <button type="submit" class="dropdown-item">PDF</button>
+                    </form>
+                </li>
+                <li>
+                    <form method="post" action="@Url.Action("DownloadCreditExcel", "Report")">
+                        <input type="hidden" name="id" value='@ViewBag.SelectedReportId'/>
+                        <input type="hidden" name="jsonModel" value='@Html.Raw(jsonModel)'/>
+                        <input type="hidden" name="jsonModelTotal" value='@Html.Raw(jsonModelTotal)'/>
+                        <input type="hidden" name="startDate" value='@ViewBag.StartDate)'/>
+                        <input type="hidden" name="endDate" value='@ViewBag.EndDate'/>
+                        <button type="submit" class="dropdown-item">Excel</button>
+                    </form>
+                </li>
+                <li>
+                    <form method="post" action="@Url.Action("DownloadCreditWord", "Report")">
+                        <input type="hidden" name="id" value='@ViewBag.SelectedReportId'/>
+                        <input type="hidden" name="jsonModel" value='@Html.Raw(jsonModel)'/>
+                        <input type="hidden" name="jsonModelTotal" value='@Html.Raw(jsonModelTotal)'/>
+                        <input type="hidden" name="startDate" value='@ViewBag.StartDate)'/>
+                        <input type="hidden" name="endDate" value='@ViewBag.EndDate'/>
+                        <button type="submit" class="dropdown-item">Word</button>
+                    </form>
+                </li>
+            </ul>
+
+            <table>
+                @{
+                    int j = 1;
+                    var reportData = ViewBag.ReportData as List<Production.DTO.CreditReportDto>;
+                    var credit = reportData.FirstOrDefault().Credit;
+                    var term = credit.TermInYears;
+                    var interest = credit.InterestRate;
+                    var penalty = credit.Penalty;
+                    var creditId = credit.Id;
+                }
+                <thead>
+                <tr>
+                    <th>№</th>
+                    <th>Payment Date</th>
+                    <th>Status</th>
+                    <th>Principal Amount</th>
+                    <th>Interest Amount</th>
+                    <th>Total Amount</th>
+                    <th>Remaining Interest</th>
+                    <th>Overdue days</th>
+                    <th>Penalty</th>
+                    <th>Final Amount</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td colspan="10" style="text-align: center; font-weight: bold; background-color:#f9f9f9">
+                        Credit №@j: Term - @term years, Interest Rate - @interest%, Penalty - @penalty%
+                    </td>
+                </tr>
+                @{
+                    j++;
+                    int i = 1;
+                    int k = 0;
+                }
+                @foreach (var row in ViewBag.ReportData)
+                {
+                    if (k < reportData.Count && reportData[k].CreditId != creditId)
+                    {
+                        creditId = reportData[k].CreditId;
+                        credit = reportData[k].Credit;
+                        term = credit.TermInYears;
+                        interest = credit.InterestRate;
+                        penalty = credit.Penalty;
+                        <tr>
+                            <td colspan="10" style="text-align: center; font-weight: bold; background-color:#f9f9f9">
+                                Credit №@j: Term - @term years, Interest Rate - @interest%, Penalty - @penalty%
+                            </td>
+                        </tr>
+                        j++;
+                        i = 1;
+                    }
+                    <tr>
+                        <td>@i</td>
+                        <td>@row.PaymentDate</td>
+                        <td>@row.Status</td>
+                        <td>@row.PrincipalAmount.ToString("F2")</td>
+                        <td>@row.InterestAmount.ToString("F2")</td>
+                        <td>@row.TotalAmount.ToString("F2")</td>
+                        <td>@row.RemainingInterest.ToString("F2")</td>
+                        <td>@row.OverdueDays</td>
+                        <td>@row.Penalty.ToString("F2")</td>
+                        <td>@row.FinalAmount.ToString("F2")</td>
+                    </tr>
+                    i++;
+                    k++;
+                }
+
+                <tr style="font-weight:bold; background-color:#f9f9f9;">
+                    <td colspan="3" class="text-end">Totals:</td>
+                    <td>@ViewBag.ReportTotal.PrincipalAmounts.ToString("F2")</td>
+                    <td>@ViewBag.ReportTotal.InterestAmounts.ToString("F2")</td>
+                    <td>@ViewBag.ReportTotal.TotalAmounts.ToString("F2")</td>
+                    <td>@ViewBag.ReportTotal.RemainingInterests.ToString("F2")</td>
+                    <td>@ViewBag.ReportTotal.OverdueDays</td>
+                    <td>@ViewBag.ReportTotal.Penalties.ToString("F2")</td>
+                    <td>@ViewBag.ReportTotal.FinalAmounts.ToString("F2")</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <h2>Payments not found</h2>
+    }
+</div>
+</body>
+<script>
+    function toggleDateRange() {
+        const form = document.getElementById("dateRangeForm");
+        form.style.display = (form.style.display === "none" || form.style.display === "") ? "block" : "none";
+    }
+
+    function checkAndSubmit() {
+        const startDate = document.getElementById("startDate").value;
+        const endDate = document.getElementById("endDate").value;
+
+        if (startDate && endDate) {
+            document.getElementById("dateRangeForm").submit();
+        }
+    }
+
+    function resetDateRange() {
+        document.getElementById("startDate").value = "";
+        document.getElementById("endDate").value = "";
+        window.location.href = '@Url.Action("GetCreditReportByType", "Report")';
+    }
+</script>
+</html>

@@ -1,0 +1,8 @@
+﻿@model Production.Models.RawMaterial
+
+@{
+    ViewData["Title"] = "Edit raw material";
+    ViewData["Action"] = Url.Action("UpdateRawMaterial");
+}
+
+@await Html.PartialAsync("_RawMaterialForm", Model)

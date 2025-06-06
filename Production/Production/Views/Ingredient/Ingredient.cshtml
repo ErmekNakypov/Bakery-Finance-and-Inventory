@@ -1,0 +1,76 @@
+﻿@model List<Production.Models.Ingredient>
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Ingredients</title>
+    <link rel="stylesheet" href="~/css/styles.css"/>
+</head>
+<body>
+<div>
+    <div>
+        <h2>
+            Ingredients
+        </h2>
+        <div class="ingredient-select">
+                <form method="get" action="@Url.Action("GetIngredientsByProductId", "Ingredient")">
+                    <select class="form-control" name="id" onchange="this.form.submit();">
+                        <!option value="" disabled @(ViewBag.ProductsName == null ? "selected" : "")>
+                            -- Select a product --
+                        </!option>
+
+                        @foreach (var product in ViewBag.Products)
+                        {
+                        <!option value="@product.Id" @(ViewBag.ProductsName == product.Name ? "selected=\"selected\"" : "")>
+                            @product.Name
+                        </!option>
+                        }
+                    </select>
+                </form>
+
+            <div class="under_table_buttons">
+                <a href="@Url.Action("CreateIngredient")" class="btn btn-primary">Add</a>
+            </div>
+            <div>
+                @if (Model.Count > 0)
+                {
+                    <table class="ingredient-table">
+                        <thead>
+                        <tr>
+                            <th>Raw material</th>
+                            <th>Quantity</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var ingredient in Model)
+                        {
+                            <tr>
+                                <td>@ingredient.RawMaterial.Name</td>
+                                <td>@ingredient.Quantity</td>
+                                <td>
+                                    <a href="@Url.Action("GetIngredientById", new {id = ingredient.Id})" class="btn btn-warning">Edit</a>
+                                    <form class="delete_product" method="post" action="@Url.Action("DeleteIngredient", new {id = ingredient.Id})">
+                                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure?');">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                }
+                else {
+                    <h2>Ingredients not found</h2>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,8 @@
+﻿@model Production.Models.ProductManufacturing
+
+@{
+    ViewData["Title"] = "Edit Product Manufacturing";
+    ViewData["Action"] = Url.Action("UpdateProductManufacturing");
+}
+
+@await Html.PartialAsync("_ProductManufacturingForm", Model)

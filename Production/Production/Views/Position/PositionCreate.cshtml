@@ -1,0 +1,8 @@
+﻿@model Microsoft.AspNetCore.Identity.IdentityRole
+
+@{
+    ViewData["Title"] = "Create position";
+    ViewData["Action"] = Url.Action("CreatePositionPost");
+}
+
+@await Html.PartialAsync("_PositionForm", Model)

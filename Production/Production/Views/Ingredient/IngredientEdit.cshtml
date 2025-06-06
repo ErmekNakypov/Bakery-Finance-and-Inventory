@@ -1,0 +1,8 @@
+﻿@model Production.Models.Ingredient
+
+@{
+    ViewData["Title"] = "Edit ingredient";
+    ViewData["Action"] = Url.Action("UpdateIngredient");
+}
+
+@await Html.PartialAsync("_IngredientForm", Model)

@@ -1,0 +1,190 @@
+﻿body {
+    font-family: "Franklin Gothic Book", sans-serif;
+}
+
+header {
+    text-align: center;
+    background-color: black;
+    color: white;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    font-size: 19px;
+    gap: 13px;
+}
+
+a {
+    text-decoration: none;
+    color: black;   
+}
+
+div h2 {
+    text-align: center;
+    margin: 60px;
+}
+
+a:hover {
+    text-decoration: underline; 
+    color: blue;
+}
+
+table {
+    width: 80%;
+    font-size: 18px;
+    border: 1px solid #ddd;
+    border-collapse: collapse;
+    margin: 30px auto;
+}
+
+.payment-table {
+    width: 100%;
+    font-size: 18px;
+    border: 1px solid #ddd;
+    border-collapse: collapse;
+    margin: 30px auto;
+}
+
+th, td {
+    padding: 10px;
+    text-align: center;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+.delete_product {
+    display: inline-block;
+}
+
+.under_table_buttons {
+    margin-top: 40px;
+    text-align: center;
+}
+
+.edit_product input,
+.edit_product select {
+    min-width: 400px; 
+}
+
+.login input {
+    min-width: 400px;
+}
+
+#showPasswordCheckBox {
+    min-width: auto 
+}
+
+.login,
+.edit_product {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.ingredient-select select {
+    max-width: 400px;
+}
+
+.report-select,
+.ingredient-select {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.ingredient-table {
+    width: 100%;
+    font-size: 18px;
+    border: 1px solid #ddd;
+    border-collapse: collapse;
+}
+
+.salary-table {
+    width: 80%;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-collapse: collapse;
+}
+
+.salary-container {
+    display: flex;
+    justify-content: center;
+    gap: 70px;
+    align-items: flex-end;
+}
+
+.salary-select {
+    display: flex;
+    flex-direction: column;
+}
+
+.report-select select,
+.salary-select select {
+    max-width: 500px;
+}
+
+.report-link {
+    font-size: 15px;
+    text-decoration: none;
+    padding: 8px 20px;
+    background-color: #28a745;
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.report-link:hover {
+    background-color: #bdffcc;
+    transform: translateY(-2px);
+    text-decoration: none;
+}
+
+.report-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+    text-decoration: none;
+}
+
+.report-card {
+    background-color: #efefef;
+    padding: 25px 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    color: #333;
+    text-decoration: none;
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+}
+
+.report-card h2 {
+    margin: 0 0 8px 0;
+    font-size: 22px;
+    font-weight: 600;
+    color: #222;
+    text-align: left;
+    text-decoration: none;
+}
+
+.report-card p {
+    margin: 0;
+    font-size: 16px;
+    color: #555;
+    line-height: 1.5;
+    text-align: left;
+    text-decoration: none;
+}
+
+.report-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.12);
+    background-color: #e6f7ee;
+    text-decoration: none;
+}

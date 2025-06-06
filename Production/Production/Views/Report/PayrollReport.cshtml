@@ -1,0 +1,231 @@
+﻿@using System.Text.Json
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="~/css/styles.css"/>
+    <title>Payroll report</title>
+</head>
+<body>
+<div>
+    <div>
+        <h2>@ViewBag.ReportTitle</h2>
+
+        <!--<div class="d-flex justify-content-center my-4">
+            <button type="button" class="btn btn-outline-primary mb-3" onclick="toggleMonthYearRange()">Select year & month</button>
+        </div> -->
+
+        <form id="monthYearForm" method="get" action="@Url.Action("GetPayrollReport", "Report")"
+              style="display:@((ViewData["Year"] != null && ViewData["Month"] != null))">
+
+            <div class="d-flex justify-content-center mb-3">
+                <div class="form-group mx-2">
+                    <label for="yearCombo">Year:</label>
+                    <select id="yearCombo" name="Year" class="form-control" onchange="checkAndSubmit()">
+                        <option value="">Select Year</option>
+                        @foreach (var year in ViewBag.Payrolls.Years as List<int>)
+                        {
+                            <!option value="@year" @(Convert.ToInt32(ViewData["Year"] ?? 0) == year ? "selected" : "")>@year</!option>
+                        }
+                    </select>
+                </div>
+                <div class="form-group mx-2">
+                    <label for="monthCombo">Month:</label>
+                    <select id="monthCombo" name="Month" class="form-control" onchange="checkAndSubmit()">
+                        <option value="">Select Month</option>
+                        @foreach (var month in ViewBag.Payrolls.Months as Dictionary<string, int>)
+                        {
+                            <!option value="@month.Value" @(Convert.ToInt32(ViewData["Month"] ?? 0) == month.Value ? "selected" : "")>@month.Key</!option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-center">
+                <button type="button" class="btn btn-outline-danger" onclick="resetMonthYear()">Reset</button>
+            </div>
+        </form>
+
+        @if ((ViewBag.ReportData != null && ViewBag.ReportData.Count > 0) && (ViewData["Month"] != null && ViewData["Year"] != null))
+        {
+            var jsonModel = JsonSerializer.Serialize(ViewBag.ReportData);
+            var jsonModelTotal = JsonSerializer.Serialize(ViewBag.ReportTotal);
+
+            <div class="under_table_buttons dropdown">
+                <button class="btn btn-primary dropdown-toggle" type="button" id="downloadDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    Download
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="downloadDropdown">
+                    <li>
+                        <form method="post" action="@Url.Action("DownloadPayrollPdf", "Report")">
+                            <input type="hidden" name="jsonModel" value='@Html.Raw(jsonModel)'/>
+                            <input type="hidden" name="jsonModelTotal" value='@Html.Raw(jsonModelTotal)'/>
+                            <input type="hidden" name="month" value='@Convert.ToInt32(ViewData["Month"])'/>
+                            <input type="hidden" name="year" value='@Convert.ToInt32(ViewData["Year"])'/>
+                            <button type="submit" class="dropdown-item">PDF</button>
+                        </form>
+                    </li>
+                    <li>
+                        <form method="post" action="@Url.Action("DownloadPayrollExcel", "Report")">
+                            <input type="hidden" name="jsonModel" value='@Html.Raw(jsonModel)'/>
+                            <input type="hidden" name="jsonModelTotal" value='@Html.Raw(jsonModelTotal)'/>
+                            <input type="hidden" name="month" value='@Convert.ToInt32(ViewData["Month"])'/>
+                            <input type="hidden" name="year" value='@Convert.ToInt32(ViewData["Year"])'/>
+                            <button type="submit" class="dropdown-item">Excel</button>
+                        </form>
+                    </li>
+                    <li>
+                        <form method="post" action="@Url.Action("DownloadPayrollWord", "Report")">
+                            <input type="hidden" name="jsonModel" value='@Html.Raw(jsonModel)'/>
+                            <input type="hidden" name="jsonModelTotal" value='@Html.Raw(jsonModelTotal)'/>
+                            <input type="hidden" name="month" value='@Convert.ToInt32(ViewData["Month"])'/>
+                            <input type="hidden" name="year" value='@Convert.ToInt32(ViewData["Year"])'/>
+                            <button type="submit" class="dropdown-item">Word</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+
+            <table>
+                <thead>
+                <tr>
+                    <th>№</th>
+                    <th>
+                        <a href="@Url.Action("GetPayrollReport", new { year = ViewData["Year"], month = ViewData["Month"], sortField = "EmployeeName", sortDirection = ViewBag.NextSortDirection })">
+                            Employee
+                            @if (ViewBag.SortField == "EmployeeName")
+                            {
+                                <span>@(ViewBag.SortDirection == "ASC" ? "▲" : "▼")</span>
+                            }
+                        </a>
+                    </th>
+                    <th>
+                        <a href="@Url.Action("GetPayrollReport", new { year = ViewData["Year"], month = ViewData["Month"], sortField = "Salary", sortDirection = ViewBag.NextSortDirection })">
+                            Salary
+                            @if (ViewBag.SortField == "Salary")
+                            {
+                                <span>@(ViewBag.SortDirection == "ASC" ? "▲" : "▼")</span>
+                            }
+                        </a>
+                    </th>
+                    <th>Status</th>
+                    <th>
+                        <a href="@Url.Action("GetPayrollReport", new { year = ViewData["Year"], month = ViewData["Month"], sortField = "PurchaseParticipation", sortDirection = ViewBag.NextSortDirection })">
+                            Purchases
+                            @if (ViewBag.SortField == "PurchaseParticipation")
+                            {
+                                <span>@(ViewBag.SortDirection == "ASC" ? "▲" : "▼")</span>
+                            }
+                        </a>
+                    </th>
+                    <th>
+                        <a href="@Url.Action("GetPayrollReport", new { year = ViewData["Year"], month = ViewData["Month"], sortField = "ProductionParticipation", sortDirection = ViewBag.NextSortDirection })">
+                            Production
+                            @if (ViewBag.SortField == "ProductionParticipation")
+                            {
+                                <span>@(ViewBag.SortDirection == "ASC" ? "▲" : "▼")</span>
+                            }
+                        </a>
+                    </th>
+                    <th>
+                        <a href="@Url.Action("GetPayrollReport", new { year = ViewData["Year"], month = ViewData["Month"], sortField = "SalesParticipation", sortDirection = ViewBag.NextSortDirection })">
+                            Sales
+                            @if (ViewBag.SortField == "SalesParticipation")
+                            {
+                                <span>@(ViewBag.SortDirection == "ASC" ? "▲" : "▼")</span>
+                            }
+                        </a>
+                    </th>
+                    <th>
+                        <a href="@Url.Action("GetPayrollReport", new { year = ViewData["Year"], month = ViewData["Month"], sortField = "TotalParticipation", sortDirection = ViewBag.NextSortDirection })">
+                            Total Participation
+                            @if (ViewBag.SortField == "TotalParticipation")
+                            {
+                                <span>@(ViewBag.SortDirection == "ASC" ? "▲" : "▼")</span>
+                            }
+                        </a>
+                    </th>
+                    <th>
+                        <a href="@Url.Action("GetPayrollReport", new { year = ViewData["Year"], month = ViewData["Month"], sortField = "Bonus", sortDirection = ViewBag.NextSortDirection })">
+                            Bonus
+                            @if (ViewBag.SortField == "Bonus")
+                            {
+                                <span>@(ViewBag.SortDirection == "ASC" ? "▲" : "▼")</span>
+                            }
+                        </a>
+                    </th>
+                    <th>
+                        <a href="@Url.Action("GetPayrollReport", new { year = ViewData["Year"], month = ViewData["Month"], sortField = "TotalAmount", sortDirection = ViewBag.NextSortDirection })">
+                            Total Amount
+                            @if (ViewBag.SortField == "TotalAmount")
+                            {
+                                <span>@(ViewBag.SortDirection == "ASC" ? "▲" : "▼")</span>
+                            }
+                        </a>
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                @{
+                    int i = 1;
+                }
+                @foreach (var row in ViewBag.ReportData)
+                {
+                    <tr>
+                        <td>@i</td>
+                        <td>@row.EmployeeName</td>
+                        <td>@row.Salary</td>
+                        <td>@row.Status</td>
+                        <td>@row.PurchaseParticipation</td>
+                        <td>@row.ProductionParticipation</td>
+                        <td>@row.SalesParticipation</td>
+                        <td>@row.TotalParticipation</td>
+                        <td>@row.Bonus.ToString("F2")</td>
+                        <td>@row.TotalAmount.ToString("F2")</td>
+                    </tr>
+                    i++;
+                }
+
+                <tr style="font-weight:bold; background-color:#f9f9f9;">
+                    <td colspan="4" class="text-end">Totals:</td>
+                    <td>@ViewBag.ReportTotal.PurchaseParticipation</td>
+                    <td>@ViewBag.ReportTotal.ProductionParticipation</td>
+                    <td>@ViewBag.ReportTotal.SalesParticipation</td>
+                    <td>@ViewBag.ReportTotal.TotalParticipation</td>
+                    <td>@ViewBag.ReportTotal.Bonus.ToString("F2")</td>
+                    <td>@ViewBag.ReportTotal.TotalAmount.ToString("F2")</td>
+                </tr>
+                </tbody>
+            </table>
+        }
+
+    </div>
+</div>
+
+<script>
+    //function toggleMonthYearRange() {
+      //  const form = document.getElementById("monthYearForm");
+       // form.style.display = (form.style.display === "none" || form.style.display === "") ? "block" : "none";
+    //}
+
+    function checkAndSubmit() {
+        const year = document.getElementById("yearCombo").value;
+        const month = document.getElementById("monthCombo").value;
+
+        if (year && month) {
+            document.getElementById("monthYearForm").submit();
+        }
+    }
+
+    function resetMonthYear() {
+        document.getElementById("yearCombo").value = "";
+        document.getElementById("monthCombo").value = "";
+        window.location.href = '@Url.Action("GetPayrollReport", "Report")';
+    }
+</script>
+
+</body>
+</html>

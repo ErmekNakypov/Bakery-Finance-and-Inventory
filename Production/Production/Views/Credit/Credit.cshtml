@@ -1,0 +1,56 @@
+﻿@model List<Production.Models.Credit>
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Credit</title>
+    <link rel="stylesheet" href="~/css/styles.css"/>
+</head>
+<body>
+<div>
+    <div>
+        <h2>
+            Credit
+        </h2>
+    </div>
+
+    <div class="under_table_buttons">
+        <a href="@Url.Action("CreateCredit")" class="btn btn-primary">Get Credit</a>
+    </div>
+    @if (Model.Count == 0)
+    {
+        <h2>Credits not found.</h2>
+    }
+    else
+    {
+    <table>
+        <thead>
+        <tr>
+            <th>Total Amount</th>
+            <th>Start Date</th>
+            <th>Term In Years</th>
+            <th>InterestRate</th>
+            <th>Penalty</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var credit in Model)
+        {
+        <tr>
+            <td>@credit.TotalAmount</td>
+            <td>@credit.StartDate</td>
+            <td>@credit.TermInYears</td>
+            <td>@credit.InterestRate</td>
+            <td>@credit.Penalty</td>
+        </tr>
+        }
+        </tbody>
+    </table>
+    }
+</div>
+</body>
+</html>

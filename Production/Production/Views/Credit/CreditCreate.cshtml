@@ -1,0 +1,8 @@
+﻿@model Production.Models.Credit
+
+@{
+    ViewData["Title"] = "Get Credit";
+    ViewData["Action"] = Url.Action("CreateCreditPost");
+}
+
+@await Html.PartialAsync("_CreditForm", Model)

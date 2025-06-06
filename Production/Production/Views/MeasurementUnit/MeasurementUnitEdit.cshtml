@@ -1,0 +1,8 @@
+﻿@model Production.Models.MeasurementUnit
+
+@{
+    ViewData["Title"] = "Edit measurement unit";
+    ViewData["Action"] = Url.Action("UpdateMeasurementUnit");
+}
+
+@await Html.PartialAsync("_MeasurementUnitForm", Model)

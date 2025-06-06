@@ -1,0 +1,8 @@
+﻿@model Production.Models.Budget
+
+@{
+    ViewData["Title"] = "Edit budget";
+    ViewData["Action"] = Url.Action("UpdateBudget");
+}
+
+@await Html.PartialAsync("_BudgetForm", Model)

@@ -1,0 +1,65 @@
+﻿@model Production.Models.Ingredient
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="~/css/styles.css"/>
+    <title>@ViewData["Title"]</title>
+</head>
+<body>
+<div>
+    <h2>
+        @ViewData["Title"]
+    </h2>
+</div>
+<div class="edit_product mt-4">
+
+    <form action="@ViewData["Action"]" method="post">
+        @if (!ViewData.ModelState.IsValid)
+        {
+        <div class="alert alert-danger">
+            @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+        </div>
+        }
+
+        <input type="hidden" name="ID" value="@Model.Id"/>
+
+        <div class="form-group mb-3">
+            <label for="Product">Product</label>
+            <select  class="form-control" id="Product" name="ProductId">
+                @foreach (var prod in ViewBag.Products)
+                {
+                    <!option value="@prod.Id"
+                             @(Context.Session.GetInt32("SelectedProductId") == prod.Id ? "selected=\"selected\"" : "")>
+                        @prod.Name
+                    </!option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="Raw-Material">Raw Material</label>
+            <select class="form-control" id="Raw-Material" name="RawMaterialId">
+                @foreach (var rm in ViewBag.RawMaterials)
+                {
+                    <option value="@rm.Id" selected="@(rm.Id == Model.RawMaterialId ? "selected" : null)"> @rm.Name</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="Quantity">Количество</label>
+            <input lang="en" type="number" class="form-control" id="Quantity" name="Quantity" step="0.01"
+                   value="@Model.Quantity">
+            <span asp-validation-for="Quantity" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+    </form>
+</div>
+</body>
+</html>

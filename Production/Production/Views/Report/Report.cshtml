@@ -1,0 +1,46 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Reports</title>
+    <link rel="stylesheet" href="~/css/styles.css"/>
+</head>
+<body>
+<div>
+    <div>
+        <h2>
+            Reports
+        </h2>
+    </div>
+<div class="report-container">
+    <a href="@Url.Action("SalesReport", "Report")" class="report-card">
+        <h2>Product Sales Report</h2>
+        <p>View detailed statistics on product sales.</p>
+    </a>
+
+    <a href="@Url.Action("PurchasesReport", "Report")" class="report-card">
+        <h2>Raw Material Purchases Report</h2>
+        <p>View all purchases of raw materials.</p>
+    </a>
+
+    <a href="@Url.Action("ManufacturingReport", "Report")" class="report-card">
+        <h2>Manufacturing Report</h2>
+        <p>View the production output and efficiency.</p>
+    </a>
+
+    <a href="@Url.Action("PayrollReport", "Report")" class="report-card">
+        <h2>Payroll Report</h2>
+        <p>View employee salary payments.</p>
+    </a>
+
+    <a href="@Url.Action("CreditReport", "Report")" class="report-card">
+        <h2>Credit Report</h2>
+        <p>View credits and payments.</p>
+    </a>
+</div>
+</div>
+</body>
+</html>

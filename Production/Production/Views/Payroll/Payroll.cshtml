@@ -1,0 +1,142 @@
+﻿@model Production.DTO.PayrollDto
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="~/css/styles.css"/>
+    <title>Payroll</title>
+</head>
+<body>
+<div>
+    <div>
+        <h2>
+            Payrolls
+        </h2>
+    
+        <form id="payrollForm" action="@Url.Action("CreatePayroll")" method="post">
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger">
+                    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+                </div>
+            }
+            <div class="salary-container">
+                <div class="salary-select">
+                    <label for="yearCombo">Year:</label>
+                    <select id="yearCombo" name="Year" class="form-control">
+                        <option value="0">Select Year</option>
+                        @foreach (var year in ViewBag.Payrolls.Years)
+                        {
+                            <!option value="@year" @(Convert.ToInt32(ViewData["Year"] ?? 0) == year ? "selected=\"selected\"" : "")>@year</!option>
+                        }
+                        }
+                    </select>
+                </div>
+                <div class="salary-select">
+                    <label for="monthCombo">Month:</label>
+                    <select id="monthCombo" name="Month" class="form-control">
+                        <option value="0">Select Month</option>
+                        @foreach (var month in ViewBag.Payrolls.Months)
+                        {
+                            <!option value="@month.Value" @(Convert.ToInt32(ViewData["Month"] ?? 0) == month.Value ? "selected=\"selected\"" : "")>@month.Key</!option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </form>
+    
+        <div>
+            @if (Model.Payrolls.Count > 0)
+            { 
+                <div class="under_table_buttons">
+                    <a href="@Url.Action("ProcessPayroll", new {Model.TotalSum, Model.Year, Model.Month})" class="btn btn-success">Pay</a>
+                </div>
+            
+                <table class="salary-table">
+                    <thead>
+                    <tr>
+                        <th>Employee</th>
+                        <th>Salary</th>
+                        <th>Purchase part.</th>
+                        <th>Production part.</th>
+                        <th>Sales part.</th>
+                        <th>Total part.</th>
+                        <th>Bonus</th>
+                        <th>Total Amount</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var payroll in Model.Payrolls)
+                    {
+                        <tr>
+                            <td>@payroll.FullName</td>
+                            <td>@payroll.Salary</td>
+                            <td>@payroll.PurchaseParticipation</td>
+                            <td>@payroll.ProductionParticipation</td>
+                            <td>@payroll.SalesParticipation</td>
+                            <td>@payroll.TotalParticipation</td>
+                            <td>@payroll.Bonus</td>
+                            <td>@payroll.TotalAmount</td>
+                            <td class="status-condition">@payroll.Status</td>
+                            <td>
+                                <a href="@Url.Action("GetPayrollById", new {id = payroll.Id, Model.Year, Model.Month})" class="btn btn-warning edit-payroll">Edit</a>
+                            </td>
+                        </tr>
+                    }
+                    <tr style="font-weight: bold; background-color: #f9f9f9;">
+                        <td colspan="7"></td>
+                        <td>Total: @Model.TotalSum</td>
+                        <td colspan="3"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            
+            }
+            else {
+                <h2>Payrolls not found</h2>
+            }
+        </div>
+
+    </div>
+</div>
+<script>
+    const yearSelect = document.getElementById('yearCombo');
+    const monthSelect = document.getElementById('monthCombo');
+    const form = document.getElementById('payrollForm');
+
+    function trySubmitForm() {
+        const year = parseInt(yearSelect.value);
+        const month = parseInt(monthSelect.value);
+
+        if (year > 0 && month > 0) {
+            form.submit();
+        }
+    }
+
+    yearSelect.addEventListener('change', trySubmitForm);
+    monthSelect.addEventListener('change', trySubmitForm);
+    document.addEventListener('DOMContentLoaded', function () {
+        const rows = document.querySelectorAll('tr');
+
+        rows.forEach(row => {
+            const statusCell = row.querySelector('.status-condition');
+            const editButton = row.querySelector('.edit-payroll');
+
+            if (statusCell && editButton) {
+                const statusText = statusCell.textContent.trim().toLowerCase();
+
+                if (statusText === 'paid') {
+                    editButton.style.display = 'none';
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>

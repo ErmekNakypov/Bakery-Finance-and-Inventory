@@ -1,0 +1,112 @@
+﻿@model Production.DTO.PaymentResultDto
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Payment</title>
+    <link rel="stylesheet" href="~/css/styles.css"/>
+</head>
+<body>
+<div>
+    <div>
+        <h2>
+            Credit Payment
+        </h2>
+    </div>
+    
+    @if (Model.Payments.Count == 0)
+    {
+        <h2>Payments not found.</h2>
+    }
+    else
+    {
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger">
+                @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+            </div>
+        }
+        <table class="payment-table">
+            <thead>
+            <tr>
+                <th>№.Month</th>
+                <th>Payment Date</th>
+                <th>Principal Amount</th>
+                <th>Interest Amount</th>
+                <th>Total Amount</th>
+                <th>Remaining Interest</th>
+                <th>Overdue Days</th>
+                <th>Penalty</th>
+                <th>Final Amount</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            @{
+            bool isFirstUnpaidFound = false;
+            }
+            @foreach (var payment in Model.Payments)
+            {
+                <tr>
+                    <td>@payment.MonthNumber</td>
+                    <td>@payment.PaymentDate</td>
+                    <td>@payment.PrincipalAmount.ToString("F2")</td>
+                    <td>@payment.InterestAmount.ToString("F2")</td>
+                    <td>@payment.TotalAmount.ToString("F2")</td>
+                    <td>@payment.RemainingInterest.ToString("F2")</td>
+                    <td>@payment.OverdueDays</td>
+                    <td>@payment.Penalty.ToString("F2")</td>
+                    <td>@payment.FinalAmount.ToString("F2")</td>
+                    <td>@payment.Status</td>
+                    <td>
+                        @if (payment.Status != "Paid" && !isFirstUnpaidFound)
+                        {
+                            isFirstUnpaidFound = true;
+                            <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#penaltyModal_@payment.Id">
+                                SetDate
+                            </button>
+
+                            <form asp-action="MakePayment" method="post" style="display:inline;">
+                                <input type="hidden" name="PaymentID" value="@payment.Id"/>
+                                <button type="submit" class="btn btn-success">Pay</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+                <div class="modal fade" id="penaltyModal_@payment.Id" tabindex="-1" aria-labelledby="penaltyModalLabel_@payment.Id" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="penaltyModalLabel_@payment.Id">Обновить пени для платежа №@payment.MonthNumber</h5>
+                                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="penaltyForm_@payment.Id" asp-action="UpdatePaymentPenalty" method="post">
+                                    <input type="hidden" name="Id" value="@payment.Id"/>
+                                    <div class="form-group">
+                                        <label for="CalculationDate_@payment.Id">Введите дату для расчёта пени:</label>
+                                        <input type="date" id="CalculationDate_@payment.Id" name="CalculationDate" class="form-control" required value="@payment.PaymentDate.ToString("yyyy-MM-dd")"/>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                                <button type="submit" form="penaltyForm_@payment.Id" class="btn btn-primary">Рассчитать</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            </tbody>
+        </table>
+    }
+</div>
+</body>
+</html>

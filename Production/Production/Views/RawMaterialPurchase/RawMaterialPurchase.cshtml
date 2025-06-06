@@ -1,0 +1,65 @@
+﻿@model List<Production.Models.RawMaterialPurchase>
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="~/css/styles.css"/>
+    <title>Raw Material Purchase</title>
+</head>
+<body>
+<div>
+    <div>
+        <h2>
+            Raw Material Purchase
+        </h2>
+    </div>
+    <div class="under_table_buttons">
+        <a href="@Url.Action("CreateRawMaterialPurchase")" class="btn btn-primary">Purchase</a>
+    </div>
+    @if (Model.Count == 0)
+    {
+    <h2>Raw material purchases not found.</h2>
+    }
+    else
+    {
+    <table>
+        <thead>
+        <tr>
+            <th>Raw Material</th>
+            <th>Quantity</th>
+            <th>Total Amount</th>
+            <th>Purchase Date</th>
+            <th>Employee</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var rmp in Model)
+        {
+        <tr>
+            <td>@rmp.RawMaterial.Name</td>
+            <td>@rmp.Quantity</td>
+            <td>@rmp.TotalAmount</td>
+            <td>@rmp.PurchaseDate</td>
+            <td>@rmp.Employee.FullName</td>
+            <td>
+                <a href="@Url.Action("GetRawMaterialPurchaseById", new {id = rmp.Id})" class="btn btn-warning">Edit</a>
+                <form class="delete_product"  method="post" action="@Url.Action("DeleteRawMaterialPurchase", new {id = rmp.Id})">
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure?');">
+                        Delete
+                    </button>
+                </form>
+            </td>
+        </tr>
+        }
+        </tbody>
+    </table>
+    }
+
+</div>
+</body>
+</html>
