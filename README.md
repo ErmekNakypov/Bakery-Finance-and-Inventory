@@ -25,3 +25,6 @@ This is a web-based information system for automating operations in a confection
 - **Technologist** – manages manufacturing and inventory.
 - **Accountant** – handles payroll and credits.
 - **Director** – views all reports and analytics.
+
+
+![Dashboard Screenshot](db-diagram.png)
